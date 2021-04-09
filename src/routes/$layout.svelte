@@ -1,45 +1,81 @@
 <script context="module">
-  import firebase from "firebase/app";
-  if (firebase.apps.length === 0) {
-    const firebaseConfig = {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID,
-      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-    };
+	import Button from '$lib/Button.svelte';
 
-    firebase.initializeApp(firebaseConfig);
-  }
+	export async function load({ session }) {
+		console.log('load')
+		console.log(session)
+		return {
+			props: {
+				user: session
+			}
+		}
+	}
+
+</script>
+<script>
+	import firebase from "firebase/app";
+
+  export let user
+	console.log(user)
+	if (firebase.apps.length === 0) {
+		const firebaseConfig = {
+			apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+			authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+			projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+			storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+			messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+			appId: import.meta.env.VITE_FIREBASE_APP_ID,
+			measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+		};
+
+		firebase.initializeApp(firebaseConfig);
+	}
+
+	function signOut() {
+		firebase
+			.auth()
+			.signOut()
+			.then(() => fetch('/api/signout.json'))
+			.catch(() => console.error("Something bad happened"));
+	}
 
 </script>
 
-<nav>
-	<a href=".">Home</a>
-	<a href="about">About</a>
-</nav>
+{#if user}
+	<Button onClick={signOut}>Logga ut</Button>
+	<span>{user.email}</span>
+{/if}
 
-<h1>Spot-on</h1>
+<h1><a href="/">Spot-On Quiz</a></h1> 
 
 <slot></slot>
 
 
 <style lang="scss">
+	@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500&family=Open+Sans:wght@300&display=swap');
+
 	:root {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-			'Open Sans', 'Helvetica Neue', sans-serif;
+		font-family: 'Open Sans', sans-serif;
+	}
+
+	:global {
+		body {
+			background-color: #1e272e;
+    	color: #ffffff;
+		}
+
+		h1, h2, h3, h4 {
+			font-family: 'Archivo', sans-serif;
+		}
 	}
 
 	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4rem;
-		font-weight: 100;
-		line-height: 1.1;
-		margin: 4rem auto;
-		max-width: 14rem;
+		text-align: center;
+	}
+
+	h1 a {
+		color: #fff;
+		text-decoration: none;
 	}
 
 	@media (min-width: 480px) {

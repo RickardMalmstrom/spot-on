@@ -5,13 +5,14 @@
   import "firebase/functions";
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';
+	import Button from '$lib/Button.svelte';
 
   const db = firebase.firestore();
 
 	let isLoading = true;
 	let isLoggedIn = false;
-	let userData
-	let roomID
+	let roomID;
+	let userData;
 
 	const getLoginURL = (scopes) => 
 		'https://accounts.spotify.com/authorize?client_id=' + import.meta.env.VITE_SPOTIFY_CLIENT_ID +
@@ -39,6 +40,7 @@
 
 		firebase.auth().onAuthStateChanged(async (user) => {
 			if (user) {
+				console.log('user')
 				isLoggedIn = true
 			} else {
 				isLoggedIn = false
@@ -46,14 +48,6 @@
 
 			isLoading = false
 		});
-
-		function signOut() {
-			firebase
-				.auth()
-				.signOut()
-				.then(() => fetch('/api/signout.json'))
-				.catch(() => console.error("Something bad happened"));
-		}
 
 	function loginWithSpotify() {
 		const url = getLoginURL([
@@ -102,31 +96,28 @@
 
 <main>
 	<section>
-		<button on:click={signOut}>Logga ut</button>
 		{#if isLoading}
-			Loading..
+		Loading..
 		{:else}
-			{#if userData}
-				<span>{userData.email}</span>
-			{/if}
 			{#if isLoggedIn}
 				<h2>Join quiz</h2>
 				<div>
 					<label for="roomID">Room id</label>
 					<input bind:value={roomID} id="roomID">
 				</div>
-				<button on:click={join}>
+				<Button onClick={join} disabled={!roomID}>
 					Join room
-				</button>
+				</Button>
 				
 				<hr />
-				<button on:click={join}>
+
+				<a href="/rooms/create">
 					Create new quiz
-				</button>
+				</a>
 			{:else}
-				<button on:click={login}>
+				<Button onClick={login}>
 					Signin with Spotify
-				</button>
+				</Button>
 			{/if}
 		{/if}
 	</section>
@@ -139,10 +130,18 @@
 		margin: 0 auto;
 	}
 
+	h1 {
+		font-size: 48px;	
+	}
+
 	p {
 		max-width: 14rem;
 		margin: 2rem auto;
 		line-height: 1.35;
+	}
+
+	a {
+		color: #fff;
 	}
 
 	@media (min-width: 480px) {

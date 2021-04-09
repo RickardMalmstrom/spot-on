@@ -1,7 +1,3 @@
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/auth";
-import "firebase/functions";
 import fetch from 'node-fetch'
 
 export async function getContext({ headers, path }) {
